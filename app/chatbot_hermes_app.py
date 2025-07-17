@@ -133,7 +133,7 @@ def gerar_mensagem_personalizada(modelo, cor, tamanho, idade, profissao, estado,
 col1, col2 = st.columns([1, 2])  # lado esquerdo (Hermes), lado direito (formulário)
 
 with col1:
-    st.image("image/hermes.png", use_container_width=True)
+    st.image("images/hermes.png", use_container_width=True)
 
 with col2:
     with st.form("formulario"):
