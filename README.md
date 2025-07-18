@@ -52,7 +52,7 @@ Com base nesses dados, o sistema consulta um modelo de recomendação e, via **O
 1. **Clone o repositório:**
 
 ```bash
-git clone https://github.com/SEU_USUARIO/scomfort-hermes-chatbot.git
+git clone https://github.com/GBilefete/scomfort-hermes-chatbot.git
 cd scomfort-hermes-chatbot
 ```
 
