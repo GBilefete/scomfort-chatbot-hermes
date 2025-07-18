@@ -147,7 +147,7 @@ with col2:
     with st.form("formulario"):
         idade = st.number_input("1️⃣ Qual a sua idade?", min_value=10, max_value=100)
         profissao = st.text_input("2️⃣ Qual a sua profissão?")
-        estado = st.text_input("3️⃣ De qual estado você é? (ex: SP, RJ)")
+        estado = st.selectbox("3️⃣ De qual estado você é?", ["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"])
         estilo = st.selectbox("4️⃣ Como descreveria seu estilo de vida?", ["Casual", "Esportivo", "Urbano", "Outro"])
         cor_pref = st.text_input("5️⃣ Tem alguma cor preferida de tênis? (opcional)")
         tamanho = st.selectbox("6️⃣ Qual o seu tamanho de calçado?", list(range(35, 45)))
