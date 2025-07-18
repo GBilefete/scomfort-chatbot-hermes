@@ -48,6 +48,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# === MAPEAMENTO DE MODELOS PARA IMAGENS ===
+modelos_imagem = {
+    "Runner": "images/runner.png",
+    "Classic": "images/classic.png",
+    "Slip-on": "images/slip-on.png"
+}
 
 # === TÍTULO E LOGO ===
 # st.image("images/hermes.png", width=180)
@@ -65,7 +71,7 @@ clientes_df = pd.read_csv("data/scomfort_clientes.csv")
 produtos_df = pd.read_csv("data/scomfort_produtos.csv")
 
 # === RECOMENDAR ===
-def recomendar_modelo(idade, profissao, estado, estilo_vida, cor_preferida):
+def recomendar_modelo(idade, profissao, estado, estilo_vida, cor_preferida, tamanho):
     faixa_idade = (clientes_df['idade'] >= idade - 3) & (clientes_df['idade'] <= idade + 3)
     mesma_profissao = clientes_df['profissao'].str.lower() == profissao.lower()
     mesmo_estado = clientes_df['estado'].str.upper() == estado.upper()
@@ -85,7 +91,9 @@ def recomendar_modelo(idade, profissao, estado, estilo_vida, cor_preferida):
         modelo_recomendado = "Slip-on"
 
     produtos_modelo = produtos_df[produtos_df['modelo'] == modelo_recomendado]
-    tamanho_mais_vendido = produtos_modelo.groupby('tamanho')['vendas_mes'].sum().idxmax()
+    
+    # Usa o número do calçado informado pelo usuário
+    tamanho_mais_adequado = tamanho
 
     if cor_preferida:
         cores_disponiveis = produtos_modelo['cor'].str.lower().unique()
@@ -96,7 +104,7 @@ def recomendar_modelo(idade, profissao, estado, estilo_vida, cor_preferida):
     else:
         cor_escolhida = produtos_modelo.groupby('cor')['avaliacao_media'].mean().idxmax()
 
-    return modelo_recomendado, cor_escolhida, tamanho_mais_vendido
+    return modelo_recomendado, cor_escolhida, tamanho_mais_adequado
 
 # === IA GENERATIVA ===
 def gerar_mensagem_personalizada(modelo, cor, tamanho, idade, profissao, estado, estilo_vida, cor_preferida):
@@ -142,12 +150,20 @@ with col2:
         estado = st.text_input("3️⃣ De qual estado você é? (ex: SP, RJ)")
         estilo = st.selectbox("4️⃣ Como descreveria seu estilo de vida?", ["Casual", "Esportivo", "Urbano", "Outro"])
         cor_pref = st.text_input("5️⃣ Tem alguma cor preferida de tênis? (opcional)")
+        tamanho = st.selectbox("6️⃣ Qual o seu tamanho de calçado?", list(range(35, 45)))
         submit = st.form_submit_button("🎯 Receber Recomendação")
 
 if submit:
     with st.spinner("Hermes está voando até o Olimpo dos dados..."):
-        modelo, cor, tamanho = recomendar_modelo(idade, profissao, estado, estilo, cor_pref)
+        modelo, cor, tamanho = recomendar_modelo(idade, profissao, estado, estilo, cor_pref, tamanho)
         mensagem = gerar_mensagem_personalizada(modelo, cor, tamanho, idade, profissao, estado, estilo, cor_pref)
         st.success("🏁 Recomendação pronta!")
         st.markdown("### 📩 Hermes diz:")
         st.markdown(mensagem)
+
+        # Exibir imagem do modelo recomendado, se existir
+        imagem_modelo = modelos_imagem.get(modelo)
+
+        if imagem_modelo:
+            st.image(imagem_modelo, caption=f"Modelo recomendado: {modelo}", use_container_width=True)
+
