@@ -21,9 +21,11 @@ A solução é um chatbot inteligente que interage com o cliente de forma divert
 - Profissão  
 - Estado  
 - Estilo de vida  
-- Cor preferida  
+- Cor preferida
 
-Com base nesses dados, o sistema consulta um modelo de recomendação e, via **OpenAI GPT-3.5**, gera mensagens empolgantes que simulam o atendimento de um consultor estiloso.
+O sistema cruza esses dados com a base de clientes da SComfort, aplicando técnicas simples de filtragem. A partir dessa análise, ele recomenda o modelo de tênis mais adequado ao perfil do usuário.
+
+Com base nesses dados, o sistema consulta um modelo de recomendação e, via **OpenAI GPT-3.5**, gera mensagens empolgantes que simulam o atendimento de um consultor animado e confiante, inspirado no mensageiro dos deuses da mitologia grega.
 
 ---
 
