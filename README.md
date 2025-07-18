@@ -89,7 +89,7 @@ scomfort-chatbot-hermes/
 ├── data/
 │   ├── scomfort_clientes.csv
 │   ├── scomfort_produtos.csv
-├── image/
+├── images/
 │   ├── hermes.png                    # Imagem do assistente
 │   ├── classic.png
 │   ├── runner.png
