@@ -8,6 +8,7 @@ import openai
 st.set_page_config(page_title="Hermes - Consultor Virtual SComfort", page_icon="👟", layout="centered")
 
 # === ESTILO PERSONALIZADO ===
+# Define o tema personalizado para o aplicativo
 st.markdown("""
     <style>
         .stApp {
@@ -49,6 +50,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # === MAPEAMENTO DE MODELOS PARA IMAGENS ===
+# Mapeia os modelos de tênis para suas respectivas imagens
 modelos_imagem = {
     "Runner": "images/runner.png",
     "Classic": "images/classic.png",
@@ -67,29 +69,51 @@ Responda às perguntas abaixo e receba uma recomendação personalizada para voa
 openai.api_key = st.secrets["openai"]["api_key"]
 
 # === DADOS ===
+# Carrega os dados dos clientes e produtos
 clientes_df = pd.read_csv("data/scomfort_clientes.csv")
 produtos_df = pd.read_csv("data/scomfort_produtos.csv")
 
 # === RECOMENDAR ===
+# Filtra clientes semelhantes com base em: idade (faixa etária), profissão, estado estilo de vida, cor preferida (se informada).
 def recomendar_modelo(idade, profissao, estado, estilo_vida, cor_preferida, tamanho):
+    # Filtra clientes que estão em uma faixa de idade semelhante (até 3 anos para mais ou para menos)
     faixa_idade = (clientes_df['idade'] >= idade - 3) & (clientes_df['idade'] <= idade + 3)
+
+    # Filtra clientes que têm a mesma profissão (ignora maiúsculas/minúsculas)
     mesma_profissao = clientes_df['profissao'].str.lower() == profissao.lower()
+
+    # Filtra clientes do mesmo estado (ignora maiúsculas/minúsculas)
     mesmo_estado = clientes_df['estado'].str.upper() == estado.upper()
+
+    # Combina os três filtros para encontrar clientes semelhantes:
+    # mesma faixa etária, mesma profissão e mesmo estado
     clientes_semelhantes = clientes_df[faixa_idade & mesma_profissao & mesmo_estado]
 
-    if clientes_semelhantes.empty:
-        modelo_recomendado = "Classic"
-    else:
+    # Verifica se há clientes semelhantes (mesma faixa etária, profissão e estado)
+    if not clientes_semelhantes.empty:
+        # Se houver, seleciona o modelo mais popular entre eles
+        # Usa o método mode() para encontrar o modelo mais frequente
         modelo_recomendado = clientes_semelhantes['modelo_preferido'].mode().values[0]
-
-    estilo = estilo_vida.lower()
-    if "esportiv" in estilo:
-        modelo_recomendado = "Runner"
-    elif "casual" in estilo:
+    else:
+       # Se não houver clientes semelhantes, define um modelo padrão inicialmente
         modelo_recomendado = "Classic"
-    elif "urbano" in estilo:
-        modelo_recomendado = "Slip-on"
 
+        # Usa o estilo de vida para refinar a recomendação
+        estilo = estilo_vida.lower() # Transforma para minúsculas para facilitar a comparação
+        
+        # Se o estilo for esportivo, recomenda o modelo Runner
+        if "esportiv" in estilo:
+            modelo_recomendado = "Runner"
+        # Se for casual, recomenda o Classic
+        elif "casual" in estilo:
+            modelo_recomendado = "Classic"
+        # Se for urbano, recomenda o Slip-on
+        elif "urbano" in estilo:
+            modelo_recomendado = "Slip-on"
+
+    # Filtra os dados dos produtos para obter as opções do modelo escolhido
+    # Cria uma série booleana indicando quais linhas têm o modelo igual ao recomendado.
+    # Cria um novo DataFrame (produtos_modelo) contendo apenas os dados do modelo escolhido.
     produtos_modelo = produtos_df[produtos_df['modelo'] == modelo_recomendado]
     
     # Usa o número do calçado informado pelo usuário
@@ -107,6 +131,7 @@ def recomendar_modelo(idade, profissao, estado, estilo_vida, cor_preferida, tama
     return modelo_recomendado, cor_escolhida, tamanho_mais_adequado
 
 # === IA GENERATIVA ===
+# Gera uma mensagem personalizada com base nas informações do cliente e na recomendação do modelo
 def gerar_mensagem_personalizada(modelo, cor, tamanho, idade, profissao, estado, estilo_vida, cor_preferida):
     prompt = f"""
     Você é Hermes, inspirado no mensageiro dos deuses, o consultor virtual da marca SComfort, especializada em tênis confortáveis.
@@ -138,6 +163,7 @@ def gerar_mensagem_personalizada(modelo, cor, tamanho, idade, profissao, estado,
     return resposta.choices[0].message.content
 
 # === FORMULÁRIO ===
+# Cria o layout do aplicativo com duas colunas: uma para o Hermes e outra para o formulário
 col1, col2 = st.columns([1, 2])  # lado esquerdo (Hermes), lado direito (formulário)
 
 with col1:
@@ -153,6 +179,8 @@ with col2:
         tamanho = st.selectbox("6️⃣ Qual o seu tamanho de calçado?", list(range(35, 45)))
         submit = st.form_submit_button("🎯 Receber Recomendação")
 
+# === PROCESSAMENTO ===
+# Quando o usuário clica no botão de enviar, processa as informações e gera a recomendação
 if submit:
     with st.spinner("Hermes está voando até o Olimpo dos dados..."):
         modelo, cor, tamanho = recomendar_modelo(idade, profissao, estado, estilo, cor_pref, tamanho)
